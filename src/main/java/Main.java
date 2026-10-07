@@ -21,7 +21,7 @@ public class Main {
                       break;
                   }
               }
-              System.out.println(arguments.trim() + ": not found")
+              System.out.println(arguments.trim() + ": not found");
           } else
               System.out.println(input + ": command not found");
       }
