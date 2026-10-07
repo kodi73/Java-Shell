@@ -3,6 +3,7 @@ import java.util.*;
 public class Main {
     public static void main(String[] args) throws Exception {
       Scanner sc = new Scanner(System.in);
+      String[] builtIns = {"echo", "exit", "type"};
       while (true) {
           System.out.print("$ ");
           String input = sc.nextLine();
@@ -13,6 +14,14 @@ public class Main {
               System.exit(0);
           } else if (command.equals("echo")) {
               System.out.println(arguments);
+          } else if (command.equals("type")) {
+              for (int i = 0; i < builtIns.length; i++) {
+                  if (arguments.trim().equals(builtIns[i])) {
+                      System.out.println(builtIns[i] + " is a shell builtin");
+                      break;
+                  }
+              }
+              System.out.println(arguments.trim() + ": not found")
           } else
               System.out.println(input + ": command not found");
       }
