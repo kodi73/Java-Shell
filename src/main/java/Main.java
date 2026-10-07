@@ -8,7 +8,7 @@ public class Main {
           String input = sc.nextLine();
           String[] inputParts = input.trim().split(" ");
           String command = inputParts[0];
-          String arguments = inputParts.join(" ", Arrays.copyOfRange(inputParts, 1, inputParts.length));
+          String arguments = String.join(" ", Arrays.copyOfRange(inputParts, 1, inputParts.length));
           if (command.equals("exit")) {
               System.exit(0);
           } else if (command.equals("echo")) {
