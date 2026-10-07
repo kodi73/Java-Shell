@@ -23,7 +23,7 @@ public class Main {
                   }
               }
               if (isBuiltIn) {
-                  System.out.println(builtIns[i] + " is a shell builtin");
+                  System.out.println(arguments.trim() + " is a shell builtin");
               } else 
                   System.out.println(arguments.trim() + ": not found");
           } else
