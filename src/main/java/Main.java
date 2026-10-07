@@ -15,13 +15,17 @@ public class Main {
           } else if (command.equals("echo")) {
               System.out.println(arguments);
           } else if (command.equals("type")) {
+              boolean isBuiltIn = false;
               for (int i = 0; i < builtIns.length; i++) {
                   if (arguments.trim().equals(builtIns[i])) {
-                      System.out.println(builtIns[i] + " is a shell builtin");
+                      isBuiltIn = true;
                       break;
                   }
               }
-              System.out.println(arguments.trim() + ": not found");
+              if (isBuiltIn) {
+                  System.out.println(builtIns[i] + " is a shell builtin");
+              } else 
+                  System.out.println(arguments.trim() + ": not found");
           } else
               System.out.println(input + ": command not found");
       }
