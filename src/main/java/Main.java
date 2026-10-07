@@ -13,8 +13,8 @@ public class Main {
               System.exit(0);
           } else if (command.equals("echo")) {
               System.out.println(arguments);
-          }
-          System.out.println(input + ": command not found");
+          } else
+              System.out.println(input + ": command not found");
       }
     }
 }
