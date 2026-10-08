@@ -19,8 +19,9 @@ public class Main {
               System.out.println(arguments);
           } else if (command.equals("type")) {
               System.out.println(type(arguments));
-          } else
-              System.out.println(input + ": command not found");
+          } else {
+              execute(command, arguments);
+          }
       }
 
       sc.close();
@@ -47,5 +48,36 @@ public class Main {
         }
 
         return command + ": not found";
+    }
+
+    private static boolean isExecutable(String command) {
+        String path = System.getenv("PATH");
+        String[] pathDirs = path.split(File.pathSeparator);
+        boolean isExecutable = false;
+
+        for (int i = 0; i < pathDirs.length; i++) {
+            File file = new File(pathDirs[i], command);
+
+            if (file.exists() && file.canExecute()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static void execute(String command, String arguments) throws IOException {
+        if (isExecutable(command)) {
+            List<String> fullCommand = new ArrayList<String>();
+            list.add(command);
+            list.add(arguments);
+
+            ProcessBuilder pb = new ProcessBuilder(fullCommand);
+            pb.redirectErrorStream(true);
+
+            System.out.println(pb.command());
+        } else {
+            System.out.println(input + ": command not found");
+        }
     }
 }
