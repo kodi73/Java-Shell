@@ -77,7 +77,7 @@ public class Main {
 
             System.out.println(pb.command());
         } else {
-            System.out.println(input + ": command not found");
+            System.out.println(command + ": command not found");
         }
     }
 }
