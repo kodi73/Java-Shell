@@ -64,19 +64,21 @@ public class Main {
 
         return false;
     }
-
-    private static void execute(String command, String arguments) throws IOException {
-        if (isExecutable(command)) {
-            List<String> fullCommand = new ArrayList<String>();
-            fullCommand.add(command);
-            fullCommand.add(arguments);
-
-            ProcessBuilder pb = new ProcessBuilder(fullCommand);
-            pb.redirectErrorStream(true);
-
-            Process process  = pb.start();
-        } else {
+    
+    private static void execute(String command, String arguments) throws IOException, InterruptedException {
+        if (!isExecutable(command)) {
             System.out.println(command + ": command not found");
+            return;
         }
+
+        List<String> fullCommand = new ArrayList<>();
+        fullCommand.add(command);
+        if (!arguments.isEmpty()) {
+            fullCommand.addAll(Arrays.asList(arguments.split("\\s+")));
+        }
+
+        ProcessBuilder pb = new ProcessBuilder(fullCommand);
+        pb.inheritIO();
+        pb.start().waitFor();
     }
 }
