@@ -53,7 +53,6 @@ public class Main {
     private static boolean isExecutable(String command) {
         String path = System.getenv("PATH");
         String[] pathDirs = path.split(File.pathSeparator);
-        boolean isExecutable = false;
 
         for (int i = 0; i < pathDirs.length; i++) {
             File file = new File(pathDirs[i], command);
@@ -75,7 +74,7 @@ public class Main {
             ProcessBuilder pb = new ProcessBuilder(fullCommand);
             pb.redirectErrorStream(true);
 
-            System.out.println(pb.command());
+            Process process  = pb.start();
         } else {
             System.out.println(command + ": command not found");
         }
