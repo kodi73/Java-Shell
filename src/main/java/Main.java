@@ -17,7 +17,7 @@ public class Main {
           } else if (command.equals("echo")) {
               System.out.println(arguments);
           } else if (command.equals("type")) {
-              System.out.println(type(arguments.()));
+              System.out.println(type(arguments));
           } else
               System.out.println(input + ": command not found");
       }
