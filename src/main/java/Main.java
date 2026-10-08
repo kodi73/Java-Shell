@@ -69,8 +69,8 @@ public class Main {
     private static void execute(String command, String arguments) throws IOException {
         if (isExecutable(command)) {
             List<String> fullCommand = new ArrayList<String>();
-            list.add(command);
-            list.add(arguments);
+            fullCommand.add(command);
+            fullCommand.add(arguments);
 
             ProcessBuilder pb = new ProcessBuilder(fullCommand);
             pb.redirectErrorStream(true);
