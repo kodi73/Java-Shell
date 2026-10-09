@@ -21,6 +21,15 @@ public class Main {
               System.out.println(type(arguments));
           } else if (command.equals("pwd")) {
               System.out.println(System.getProperty("user.dir"));
+          } else if (command.equals("cd")) {
+              String targetDirectory = arguments;
+              File file = new File(targetDirectory);
+
+              if (file.exists() && file.isDirectory()) {
+                  System.setProperty("user.dir", targetDirectory);
+              } else {
+                  System.out.println("cd: " + targetDirectory + ": No such file or directory");
+              }
           } else {
               execute(command, arguments);
           }
