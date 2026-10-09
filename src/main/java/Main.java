@@ -19,6 +19,8 @@ public class Main {
               System.out.println(arguments);
           } else if (command.equals("type")) {
               System.out.println(type(arguments));
+          } else if (command.equals("pwd")) {
+              System.out.println(System.getProperty("user.dir"));
           } else {
               execute(command, arguments);
           }
