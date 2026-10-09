@@ -27,7 +27,7 @@ public class Main {
               if (targetDirectory.startsWith("/")) {
                   file = new File(targetDirectory);
               } else if (targetDirectory.equals("~")) {
-                  file = new File(System.getProperty("HOME"));
+                  file = new File(System.getenv("HOME"));
               } else {
                   file = new File(System.getProperty("user.dir"), targetDirectory).getCanonicalFile();
               }
