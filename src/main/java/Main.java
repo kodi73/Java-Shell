@@ -23,10 +23,15 @@ public class Main {
               System.out.println(System.getProperty("user.dir"));
           } else if (command.equals("cd")) {
               String targetDirectory = arguments;
-              File file = new File(targetDirectory);
+              File file;
+              if (targetDirectory.startsWith("/")) {
+                  file = new File(targetDirectory);
+              } else {
+                  file = new File(System.getProperty("user.dir"), targetDirectory).getCanonicalFile();
+              }
 
               if (file.exists() && file.isDirectory()) {
-                  System.setProperty("user.dir", targetDirectory);
+                  System.setProperty("user.dir", file.getAbsolutePath());
               } else {
                   System.out.println("cd: " + targetDirectory + ": No such file or directory");
               }
