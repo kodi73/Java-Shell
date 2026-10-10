@@ -14,35 +14,63 @@ public class Main {
           String arguments = spaceIndex == -1 ? "" : input.substring(spaceIndex + 1).trim();
 
           if (command.equals("exit")) {
-              break;
+                break;
           } else if (command.equals("echo")) {
-              System.out.println(arguments);
+                String[] parts = parseArguments(arguments);
+                System.out.println(String.join(" ", parts));
           } else if (command.equals("type")) {
-              System.out.println(type(arguments));
+                System.out.println(type(arguments));
           } else if (command.equals("pwd")) {
-              System.out.println(System.getProperty("user.dir"));
+                System.out.println(System.getProperty("user.dir"));
           } else if (command.equals("cd")) {
-              String targetDirectory = arguments;
-              File file;
-              if (targetDirectory.startsWith("/")) {
-                  file = new File(targetDirectory);
-              } else if (targetDirectory.equals("~")) {
-                  file = new File(System.getenv("HOME"));
-              } else {
-                  file = new File(System.getProperty("user.dir"), targetDirectory).getCanonicalFile();
-              }
+                String targetDirectory = arguments;
+                File file;
+                if (targetDirectory.startsWith("/")) {
+                    file = new File(targetDirectory);
+                } else if (targetDirectory.equals("~")) {
+                    file = new File(System.getenv("HOME"));
+                } else {
+                    file = new File(System.getProperty("user.dir"), targetDirectory).getCanonicalFile();
+                }
 
-              if (file.exists() && file.isDirectory()) {
-                  System.setProperty("user.dir", file.getAbsolutePath());
-              } else {
-                  System.out.println("cd: " + targetDirectory + ": No such file or directory");
-              }
+                if (file.exists() && file.isDirectory()) {
+                    System.setProperty("user.dir", file.getAbsolutePath());
+                } else {
+                    System.out.println("cd: " + targetDirectory + ": No such file or directory");
+                }
           } else {
-              execute(command, arguments);
-          }
+                execute(command, arguments);
+            }
       }
 
       sc.close();
+    }
+
+    private static String[] parseArguments(String arguments) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inSingleQuote = false;
+
+        for (int i = 0; i < arguments.length(); i++) {
+            char ch = arguments.charAt(i);
+
+            if (ch == '\'') {
+                inSingleQuote = !inSingleQuote;
+            } else if (Character.isWhitespace(ch) && !inSingleQuote) {
+                if (current.length() > 0) {
+                    tokens.add(current.toString());
+                    current.setLength(0);
+                }
+            } else {
+                current.append(ch);
+            }
+        }
+
+        if (current.length() > 0) {
+            tokens.add(current.toString());
+        }
+
+        return tokens.toArray(new String[0]);
     }
 
     public static String type(String command) {
