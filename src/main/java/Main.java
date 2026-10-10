@@ -120,7 +120,7 @@ public class Main {
         List<String> fullCommand = new ArrayList<>();
         fullCommand.add(command);
         if (!arguments.isEmpty()) {
-            fullCommand.addAll(Arrays.asList(arguments.split("\\s+")));
+            fullCommand.addAll(Arrays.asList(parseArguments(arguments)));
         }
 
         ProcessBuilder pb = new ProcessBuilder(fullCommand);
