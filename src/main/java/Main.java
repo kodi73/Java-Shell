@@ -64,6 +64,15 @@ public class Main {
                     current.append(arguments.charAt(i + 1));
                     i++;
                 }
+            } else if (ch == '\\' && inDoubleQuote) {
+                if (i + 1 < arguments.length()) {
+                    char nextCh = arguments.charAt(i + 1);
+
+                    if (nextCh == '\\' || nextCh == '"') {
+                        current.append(nextCh);
+                        i++;
+                    }
+                }
             } else if (Character.isWhitespace(ch) && !inSingleQuote && !inDoubleQuote) {
                 if (current.length() > 0) {
                     tokens.add(current.toString());
