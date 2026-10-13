@@ -60,7 +60,7 @@ public class Main {
             } else if (ch == '\"' && !inSingleQuote) {
                 inDoubleQuote = !inDoubleQuote;
             } else if (ch == '\\' && !inSingleQuote && !inDoubleQuote) {
-                if (i + 1 < arguments.length) {
+                if (i + 1 < arguments.length()) {
                     current.append(input.charAt(i + 1));
                     i++;
                 }
