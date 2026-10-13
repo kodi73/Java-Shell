@@ -50,13 +50,16 @@ public class Main {
         List<String> tokens = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean inSingleQuote = false;
+        boolean inDoubleQuote = false;
 
         for (int i = 0; i < arguments.length(); i++) {
             char ch = arguments.charAt(i);
 
-            if (ch == '\'') {
+            if (ch == '\'' && !inDoubleQuote) {
                 inSingleQuote = !inSingleQuote;
-            } else if (Character.isWhitespace(ch) && !inSingleQuote) {
+            } else if (ch == '\"' && !inSingleQuote) {
+                inDoubleQuote = !inDoubleQuote;
+            } else if (Character.isWhitespace(ch) && !inSingleQuote && !inDoubleQuote) {
                 if (current.length() > 0) {
                     tokens.add(current.toString());
                     current.setLength(0);
