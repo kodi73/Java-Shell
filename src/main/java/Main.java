@@ -59,6 +59,11 @@ public class Main {
                 inSingleQuote = !inSingleQuote;
             } else if (ch == '\"' && !inSingleQuote) {
                 inDoubleQuote = !inDoubleQuote;
+            } else if (ch == '\\' && !inSingleQuote && !inDoubleQuote) {
+                if (i + 1 < arguments.length) {
+                    current.append(input.charAt(i + 1));
+                    i++;
+                }
             } else if (Character.isWhitespace(ch) && !inSingleQuote && !inDoubleQuote) {
                 if (current.length() > 0) {
                     tokens.add(current.toString());
