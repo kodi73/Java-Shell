@@ -6,23 +6,22 @@ public class Main {
       Scanner sc = new Scanner(System.in);
 
       while (true) {
-          System.out.print("$ ");
+        System.out.print("$ ");
+        String input = sc.nextLine();
+        int spaceIndex = input.indexOf(" ");
+        String command = spaceIndex == -1 ? input : input.substring(0, spaceIndex);
+        String arguments = spaceIndex == -1 ? "" : input.substring(spaceIndex + 1).trim();
 
-          String input = sc.nextLine();
-          int spaceIndex = input.indexOf(" ");
-          String command = spaceIndex == -1 ? input : input.substring(0, spaceIndex);
-          String arguments = spaceIndex == -1 ? "" : input.substring(spaceIndex + 1).trim();
-
-          if (command.equals("exit")) {
-                break;
-          } else if (command.equals("echo")) {
+        if (command.equals("exit")) {
+            break;
+        } else if (command.equals("echo")) {
                 String[] parts = parseArguments(arguments);
                 System.out.println(String.join(" ", parts));
-          } else if (command.equals("type")) {
+        } else if (command.equals("type")) {
                 System.out.println(type(arguments));
-          } else if (command.equals("pwd")) {
+        } else if (command.equals("pwd")) {
                 System.out.println(System.getProperty("user.dir"));
-          } else if (command.equals("cd")) {
+        } else if (command.equals("cd")) {
                 String targetDirectory = arguments;
                 File file;
                 if (targetDirectory.startsWith("/")) {
@@ -40,27 +39,18 @@ public class Main {
                 }
           } else {
             String[] inputParts = parseArguments(input);
-            String path = System.getenv("PATH");
-            String[] pathDir = path.split(File.pathSeparator);
-            boolean programExistsAndExecutable = false;
+            if (inputParts.length == 0) continue;   // empty line guard
 
-            for (int i = 0; i < pathDir.length; i++) {
-                File file = new File(pathDir[i], inputParts[0]);
-
-                if (file.exists() && file.canExecute()) {
-                    programExistsAndExecutable = true;
-                    break;
-                }
-            }
-            if (programExistsAndExecutable)
-                execute(command, arguments);
-            else 
+            if (isExecutable(inputParts[0])) {
+                execute(inputParts);
+            } else {
                 System.out.println(inputParts[0] + ": command not found");
             }
-      }
+        }
 
       sc.close();
     }
+}
 
     private static String[] parseArguments(String arguments) {
         List<String> tokens = new ArrayList<>();
@@ -161,3 +151,4 @@ public class Main {
         pb.start().waitFor();
     }
 }
+
