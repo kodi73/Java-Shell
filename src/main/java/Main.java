@@ -39,7 +39,23 @@ public class Main {
                     System.out.println("cd: " + targetDirectory + ": No such file or directory");
                 }
           } else {
+            String[] inputParts = parseArguments(input);
+            String path = System.getenv("PATH");
+            String[] pathDir = path.split(File.pathSeparator);
+            boolean programExistsAndExecutable = false;
+
+            for (int i = 0; i < pathDir.length; i++) {
+                File file = new File(pathDir[i], inputParts[0]);
+
+                if (file.exists() && file.canExecute()) {
+                    programExistsAndExecutable = true;
+                    break;
+                }
+            }
+            if (programExistsAndExecutable)
                 execute(command, arguments);
+            else 
+                System.out.println(inputParts[0] + ": command not found");
             }
       }
 
