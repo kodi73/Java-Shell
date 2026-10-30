@@ -54,7 +54,9 @@ public class Main {
                     appendMode = true;
                 }
             }
-            tokens = Arrays.copyOfRange(allTokens, 0, redirectIndex);
+            if (redirectIndex != -1) {
+                tokens = Arrays.copyOfRange(allTokens, 0, redirectIndex);
+            }
 
             String cmd = tokens[0];
             String[] cmdArgs = Arrays.copyOfRange(tokens, 1, tokens.length);
