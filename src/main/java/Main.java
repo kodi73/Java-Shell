@@ -1,11 +1,28 @@
 import java.util.*;
 import java.io.*;
+import org.jline.reader.*;
+import org.jline.reader.impl.*;
+import org.jline.reader.impl.completer.StringsCompleter;
+import org.jline.terminal.*;
+import org.jline.terminal.impl.*;
+
 
 public class Main {
     private static final String[] BUILTINS = {"echo", "exit", "type", "pwd", "cd"};
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
+
+        Terminal terminal = TerminalBuilder.builder()
+                .system(true)
+                .build();
+
+        LineReader reader = LineReaderBuilder.builder()
+                .terminal(terminal)
+                .completer(new StringsCompleter("echo", "exit", "type", "pwd", "cd"))
+                .build();
+
+        String line = reader.readLine("JLine > ");
 
         while (true) {
             System.out.print("$ ");
