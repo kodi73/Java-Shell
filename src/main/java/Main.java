@@ -214,8 +214,8 @@ public class Main {
 
         if (errorFile != null) {
             pb.redirectError(appendMode 
-                ? ProcessBuilder.Redirect.appendTo(new File(outputFile))
-                : ProcessBuilder.Redirect.to(new File(outputFile)));
+                ? ProcessBuilder.Redirect.appendTo(new File(errorFile))
+                : ProcessBuilder.Redirect.to(new File(errorFile)));
         } else {
             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
         }
