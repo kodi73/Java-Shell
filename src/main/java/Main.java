@@ -22,17 +22,39 @@ public class Main {
 
             String outputFile = null;
             String errorFile = null;
+            boolean appendMode = false;
             String[] tokens = allTokens;
 
-            int redirectIndex = findRedirectIndex(allTokens);
-            if (redirectIndex != -1 && redirectIndex + 1 < allTokens.length) {
-                if (allTokens[redirectIndex].equals("2>")) {
-                    errorFile = allTokens[redirectIndex + 1];
-                } else {
-                    outputFile = allTokens[redirectIndex + 1];
+            int redirectIndex = -1;
+            for (int i = 0; i < tokens.length; i++) {
+                if (tokens[i].equals(">") || tokens[i].equals("1>")) {
+                    redirectIndex = i;
+                    if (redirectIndex + 1 < tokens.length) {
+                        outputFile = tokens[i + 1];
+                    }
                 }
-                tokens = Arrays.copyOfRange(allTokens, 0, redirectIndex);
+                if (tokens[i].equals("2>")) {
+                    redirectIndex = i;
+                    if (redirectIndex + 1 < tokens.length) {
+                        errorFile = tokens[i + 1];
+                    }
+                }
+                if (tokens[i].equals("1>>") || tokens[i].equals(">>")) {
+                    redirectIndex = i;
+                    if (redirectIndex + 1 < tokens.length) {
+                        outputFile = tokens[i + 1];
+                    }
+                    appendMode = true;
+                }
+                if (tokens[i].equals("2>>")) {
+                    redirectIndex = i;
+                    if (redirectIndex + 1 < tokens.length) {
+                        errorFile = tokens[i + 1];
+                    }
+                    appendMode = true;
+                }
             }
+            tokens = Arrays.copyOfRange(allTokens, 0, redirectIndex);
 
             String cmd = tokens[0];
             String[] cmdArgs = Arrays.copyOfRange(tokens, 1, tokens.length);
@@ -40,10 +62,10 @@ public class Main {
             PrintStream out = System.out;
             PrintStream err = System.err;
             if (outputFile != null) {
-                out = new PrintStream(new FileOutputStream(outputFile));
+                out = new PrintStream(new FileOutputStream(outputFile, appendMode));
             }
             if (errorFile != null) {
-                err = new PrintStream(new FileOutputStream(errorFile));
+                err = new PrintStream(new FileOutputStream(errorFile, appendMode));
             }
 
             if (cmd.equals("exit")) {
@@ -58,7 +80,7 @@ public class Main {
                 changeDirectory(cmdArgs.length > 0 ? cmdArgs[0] : "", err);
             } else {
                 if (isExecutable(cmd)) {
-                    execute(tokens, outputFile, errorFile);
+                    execute(tokens, outputFile, errorFile, appendMode);
                 } else {
                     err.println(cmd + ": command not found");
                 }
@@ -73,19 +95,6 @@ public class Main {
         }
 
         sc.close();
-    }
-
-    private static int findRedirectIndex(String[] tokens) {
-        for (int i = 0; i < tokens.length; i++) {
-            if (tokens[i].equals(">") || tokens[i].equals("1>")) {
-                return i;
-            }
-            if (tokens[i].equals("2>")) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     private static void changeDirectory(String target, PrintStream err) throws IOException {
@@ -188,19 +197,23 @@ public class Main {
         return findInPath(command) != null;
     }
 
-    private static void execute(String[] fullCommand, String outputFile, String errorFile) throws IOException, InterruptedException {
+    private static void execute(String[] fullCommand, String outputFile, String errorFile, boolean appendMode) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(fullCommand);
         pb.directory(new File(System.getProperty("user.dir")));
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
 
         if (outputFile != null) {
-            pb.redirectOutput(new File(outputFile));
+            pb.redirectOutput(appendMode 
+                ? ProcessBuilder.Redirect.appendTo(new File(outputFile))
+                : ProcessBuilder.Redirect.to(new File(outputFile)));
         } else {
             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         }
 
         if (errorFile != null) {
-            pb.redirectError(new File(errorFile));
+            pb.redirectError(appendMode 
+                ? ProcessBuilder.Redirect.appendTo(new File(outputFile))
+                : ProcessBuilder.Redirect.to(new File(outputFile)));
         } else {
             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
         }
