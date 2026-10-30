@@ -21,19 +21,29 @@ public class Main {
             }
 
             String outputFile = null;
+            String errorFile = null;
             String[] tokens = allTokens;
 
             int redirectIndex = findRedirectIndex(allTokens);
             if (redirectIndex != -1 && redirectIndex + 1 < allTokens.length) {
-                outputFile = allTokens[redirectIndex + 1];
+                if (allTokens[redirectIndex].equals("2>")) {
+                    errorFile = allTokens[redirectIndex + 1];
+                } else {
+                    outputFile = allTokens[redirectIndex + 1];
+                }
                 tokens = Arrays.copyOfRange(allTokens, 0, redirectIndex);
             }
+
             String cmd = tokens[0];
             String[] cmdArgs = Arrays.copyOfRange(tokens, 1, tokens.length);
             
             PrintStream out = System.out;
+            PrintStream err = System.err;
             if (outputFile != null) {
                 out = new PrintStream(new FileOutputStream(outputFile));
+            }
+            if (errorFile != null) {
+                err = new PrintStream(new FileOutputStream(errorFile));
             }
 
             if (cmd.equals("exit")) {
@@ -45,17 +55,20 @@ public class Main {
             } else if (cmd.equals("pwd")) {
                 out.println(System.getProperty("user.dir"));
             } else if (cmd.equals("cd")) {
-                changeDirectory(cmdArgs.length > 0 ? cmdArgs[0] : "");
+                changeDirectory(cmdArgs.length > 0 ? cmdArgs[0] : "", err);
             } else {
                 if (isExecutable(cmd)) {
-                    execute(tokens, outputFile);
+                    execute(tokens, outputFile, errorFile);
                 } else {
-                    out.println(cmd + ": command not found");
+                    err.println(cmd + ": command not found");
                 }
             }
 
             if (outputFile != null) {
                 out.close();
+            }
+            if (errorFile != null) {
+                err.close();
             }
         }
 
@@ -67,12 +80,15 @@ public class Main {
             if (tokens[i].equals(">") || tokens[i].equals("1>")) {
                 return i;
             }
+            if (tokens[i].equals("2>")) {
+                return i;
+            }
         }
 
         return -1;
     }
 
-    private static void changeDirectory(String target) throws IOException {
+    private static void changeDirectory(String target, PrintStream err) throws IOException {
         File file;
         if (target.equals("~")) {
             file = new File(System.getenv("HOME"));
@@ -85,7 +101,7 @@ public class Main {
         if (file.exists() && file.isDirectory()) {
             System.setProperty("user.dir", file.getAbsolutePath());
         } else {
-            System.out.println("cd: " + target + ": No such file or directory");
+            err.println("cd: " + target + ": No such file or directory");
         }
     }
 
@@ -172,17 +188,23 @@ public class Main {
         return findInPath(command) != null;
     }
 
-    private static void execute(String[] fullCommand, String outputFile) throws IOException, InterruptedException {
+    private static void execute(String[] fullCommand, errorFile, String outputFile, String errorFile) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(fullCommand);
         pb.directory(new File(System.getProperty("user.dir")));
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
-        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
 
         if (outputFile != null) {
             pb.redirectOutput(new File(outputFile));
         } else {
             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         }
+
+        if (errorFile != null) {
+            pb.redirectError(new File(errorFile));
+        } else {
+            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+        }
+        
         pb.start().waitFor();
     }
 }
