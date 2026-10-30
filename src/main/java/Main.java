@@ -47,10 +47,10 @@ public class Main {
             } else if (cmd.equals("cd")) {
                 changeDirectory(cmdArgs.length > 0 ? cmdArgs[0] : "");
             } else {
-                if (isExecutable(allTokens[0])) {
-                    execute(allTokens, outputFile);
+                if (isExecutable(cmd)) {
+                    execute(tokens, outputFile);
                 } else {
-                    out.println(allTokens[0] + ": command not found");
+                    out.println(cmd + ": command not found");
                 }
             }
 
