@@ -14,37 +14,62 @@ public class Main {
             }
 
             String input = sc.nextLine();
-            int spaceIndex = input.indexOf(" ");
-            String command = spaceIndex == -1 ? input : input.substring(0, spaceIndex);
-            String arguments = spaceIndex == -1 ? "" : input.substring(spaceIndex + 1).trim();
 
-            if (command.equals("exit")) {
+            String[] allTokens = parseArguments(input);
+            if (allTokens.length == 0) {
+                continue;
+            }
+
+            String outputFile = null;
+            String[] tokens = allTokens;
+
+            int redirectIndex = findRedirectIndex(allTokens);
+            if (redirectIndex != -1 && redirectIndex + 1 < allTokens.length) {
+                outputFile = allTokens[redirectIndex + 1];
+                tokens = Arrays.copyOfRange(allTokens, 0, redirectIndex);
+            }
+            String cmd = tokens[0];
+            String[] cmdArgs = Arrays.copyOfRange(tokens, 1, tokens.length);
+            
+            PrintStream out = System.out;
+            if (outputFile != null) {
+                out = new PrintStream(new FileOutputStream(outputFile));
+            }
+
+            if (cmd.equals("exit")) {
                 break;
-            } else if (command.equals("echo")) {
-                String[] parts = parseArguments(arguments);
-                System.out.println(String.join(" ", parts));
-            } else if (command.equals("type")) {
-                System.out.println(type(arguments));
-            } else if (command.equals("pwd")) {
-                System.out.println(System.getProperty("user.dir"));
-            } else if (command.equals("cd")) {
-                changeDirectory(arguments);
+            } else if (cmd.equals("echo")) {
+                out.println(String.join(" ", cmdArgs));
+            } else if (cmd.equals("type")) {
+                out.println(type(cmdArgs.length > 0 ? cmdArgs[0] : ""));
+            } else if (cmd.equals("pwd")) {
+                out.println(System.getProperty("user.dir"));
+            } else if (cmd.equals("cd")) {
+                changeDirectory(cmdArgs.length > 0 ? cmdArgs[0] : "");
             } else {
-                // Parse the whole line once; use the same tokens for lookup and launch.
-                String[] inputParts = parseArguments(input);
-                if (inputParts.length == 0) {
-                    continue;
-                }
-
-                if (isExecutable(inputParts[0])) {
-                    execute(inputParts);
+                if (isExecutable(allTokens[0])) {
+                    execute(allTokens, outputFile);
                 } else {
-                    System.out.println(inputParts[0] + ": command not found");
+                    out.println(allTokens[0] + ": command not found");
                 }
+            }
+
+            if (outputFile != null) {
+                out.close();
             }
         }
 
         sc.close();
+    }
+
+    private static int findRedirectIndex(String[] tokens) {
+        for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i].equals(">") || tokens[i].equals("1>")) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private static void changeDirectory(String target) throws IOException {
@@ -147,10 +172,17 @@ public class Main {
         return findInPath(command) != null;
     }
 
-    private static void execute(String[] fullCommand) throws IOException, InterruptedException {
+    private static void execute(String[] fullCommand, String outputFile) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(fullCommand);
         pb.directory(new File(System.getProperty("user.dir")));
-        pb.inheritIO();
+        pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
+        pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+        if (outputFile != null) {
+            pb.redirectOutput(new File(outputFile));
+        } else {
+            pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        }
         pb.start().waitFor();
     }
 }
