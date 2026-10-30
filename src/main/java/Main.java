@@ -188,7 +188,7 @@ public class Main {
         return findInPath(command) != null;
     }
 
-    private static void execute(String[] fullCommand, errorFile, String outputFile, String errorFile) throws IOException, InterruptedException {
+    private static void execute(String[] fullCommand, String outputFile, String errorFile) throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder(fullCommand);
         pb.directory(new File(System.getProperty("user.dir")));
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
@@ -204,7 +204,7 @@ public class Main {
         } else {
             pb.redirectError(ProcessBuilder.Redirect.INHERIT);
         }
-        
+
         pb.start().waitFor();
     }
 }
